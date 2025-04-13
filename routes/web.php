@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pendaftars/{id}', [PendaftarController::class, 'show'])->name('pendaftars.show');
     Route::post('/pendaftars/{id}/update-status', [PendaftarController::class, 'updateStatus'])->name('pendaftars.update-status');
 
+    Route::post('/pendaftars/{id}/tandai-selesai', [PendaftarController::class, 'tandaiSelesai'])->name('pendaftars.tandai-selesai');
     // kelola pengumuman
 
     Route::resource('pengumuman', pengumumanController::class);

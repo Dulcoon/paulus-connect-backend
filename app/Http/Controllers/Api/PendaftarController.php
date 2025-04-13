@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PendaftarController extends Controller
 {
@@ -105,6 +106,7 @@ class PendaftarController extends Controller
             $pendaftar->update(array_merge($validated, $filePaths, [
                 'jenis_sakramen' => $jenisSakramen,
                 'status' => 'Menunggu konfirmasi',
+                'alasan' => null,
             ]));
         } else {
             // Buat data baru
@@ -153,5 +155,18 @@ class PendaftarController extends Controller
             'status' => null,
             'alasan' => null,
         ]);
+    }
+    public function downloadPdf($sakramenEventId)
+    {
+        // Cari pendaftar berdasarkan sakramen_event_id
+        $pendaftar = Pendaftars::where('sakramen_event_id', $sakramenEventId)->firstOrFail();
+    
+        // Periksa apakah sertifikat tersedia
+        if (!$pendaftar->sertifikat_path || !Storage::disk('public')->exists($pendaftar->sertifikat_path)) {
+            return response()->json(['error' => 'Sertifikat belum tersedia.'], 404);
+        }
+    
+        // Unduh file PDF
+        return response()->download(storage_path('app/public/' . $pendaftar->sertifikat_path));
     }
 }

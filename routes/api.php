@@ -29,10 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // mendapatkan data default pendaftar
     Route::get('/pendaftars/default', [PendaftarController::class, 'getDefaultData']);
-    // mendaftar baptis
     Route::post('/pendaftars/daftar', [PendaftarController::class, 'daftarSakramen']);
-
     Route::get('/pendaftars/check-registration', [PendaftarController::class, 'checkRegistration']);
+    
+    
     // handle pengumuman
     Route::get('/pengumuman', [ApiPengumumanGereja::class, 'index']);
     Route::get('/pengumuman/{id}', [ApiPengumumanGereja::class, 'show']);
@@ -47,3 +47,5 @@ Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail']);
 Route::post('/forgot-password/send-otp', [AuthController::class, 'sendOtp']);
 Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
+
+Route::get('/pendaftars/{id}/download-pdf', [PendaftarController::class, 'downloadPdf'])->name('pendaftars.download-pdf');

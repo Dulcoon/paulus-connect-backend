@@ -5,7 +5,17 @@
 
     <section class="bg-white dark:bg-gray-900">
         <div class="w-full px-10 min-h-screen py-10">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Detail Pendaftar {{ $pendaftar->sakramenEvent->nama_event }}</h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Detail Pendaftar {{ $pendaftar->sakramenEvent->nama_event }}</h2>
+                <form action="{{ route('pendaftars.tandai-selesai', $pendaftar->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menandai pendaftar ini sebagai selesai?')">
+    @csrf
+    <button type="submit" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+        Tandai Selesai
+    </button>
+</form>
+                
+              
+            </div>
             <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 <p><strong>Jenis sakramen:</strong> {{ $pendaftar->jenis_sakramen }}</p>
                 <p><strong>Nama Lengkap:</strong> {{ $pendaftar->nama_lengkap }}</p>
@@ -35,15 +45,18 @@
                 @csrf
                 <label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ubah Status</label>
                 <select name="status" id="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                    <option value="diproses" {{ $pendaftar->status == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                    <option value="Menunggu konfirmasi" {{ $pendaftar->status == 'Menunggu konfirmasi' ? 'selected' : '' }}>Menunggu konfirmasi</option>
                     <option value="ditolak" {{ $pendaftar->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                     <option value="diterima" {{ $pendaftar->status == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                    <option value="selesai" {{ $pendaftar->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
                 </select>
-                <label for="alasan" class="block mb-2 mt-4 text-md font-medium text-gray-900 dark:text-white">alasan</label>
-                <textarea name="alasan" id="alasan" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" rows="4" placeholder="Masukkan alasan jika ditolak">{{ old('alasan', $pendaftar->alasan) }}</textarea>
+                <label for="alasan" class="block mb-2 mt-4 text-md font-medium text-gray-900 dark:text-white">Pesan</label>
+                <textarea name="alasan" id="alasan" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" rows="4" placeholder="Masukkan pesan (optional)">{{ old('alasan', $pendaftar->alasan) }}</textarea>
                 <button type="submit" class="mt-4 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Perbarui Status</button>
+           
+
+                
             </form>
+           
         </div>
     </section>
 </x-app-layout>

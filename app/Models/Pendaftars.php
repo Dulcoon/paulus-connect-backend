@@ -26,6 +26,7 @@ class Pendaftars extends Model
         'lingkungan',
         'status',
         'alasan',
+        'sertifikat_path',
         'nama_wali_baptis',
         'berkas_kk',
         'berkas_akta_kelahiran',
