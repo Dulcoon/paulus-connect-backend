@@ -2,14 +2,16 @@
 
 use App\Http\Controllers\Api\ApiPengumumanGereja;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PendaftarController;
+use App\Http\Controllers\Api\SakramenEventController;
+use App\Http\Controllers\Api\UserProfileController;
+// use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\Api\WilayahController;
+use App\Http\Controllers\Api\FCMController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-// use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\Api\UserProfileController;
 
-use App\Http\Controllers\Api\SakramenEventController;
-use App\Http\Controllers\Api\PendaftarController;
 
 
 
@@ -36,7 +38,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // handle pengumuman
     Route::get('/pengumuman', [ApiPengumumanGereja::class, 'index']);
     Route::get('/pengumuman/{id}', [ApiPengumumanGereja::class, 'show']);
+    
+    // fcmtoken
+    Route::post('/save-fcm-token', [FCMController::class, 'saveToken']);
+    Route::post('/send-notification', [FCMController::class, 'sendNotification']);
 });
+
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -49,3 +57,5 @@ Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyOtp'])
 Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
 
 Route::get('/pendaftars/{id}/download-pdf', [PendaftarController::class, 'downloadPdf'])->name('pendaftars.download-pdf');
+
+// fcm token

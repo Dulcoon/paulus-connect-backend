@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pendaftars;
+use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\SakramenEvent;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Api\FCMController;
+use App\Services\FirebaseService;
+
 
 
 class PendaftarController extends Controller
@@ -46,16 +50,41 @@ class PendaftarController extends Controller
         return redirect()->route('pendaftars.show', $id)->with('success', 'Status berhasil diperbarui.');
     }
 
-    public function tandaiSelesai($id)
+    public function tandaiSelesai($id, FCMController $fcmController, FirebaseService $firebase)
     {
         $pendaftar = Pendaftars::findOrFail($id);
-        $pendaftar->update(['status' => 'selesai', 'alasan' => 'silahkan mengunduh surat tanda sudah menerima sakramen dibawah ini untuk pengambilan sertifikat sakramen resmi yang sudah ditandatangani Pastor paroki. jangan lupa memperbarui data sakramen anda pada user-profile anda.']);
-
+        $pendaftar->update([
+            'status' => 'selesai',
+            'alasan' => 'Silahkan mengunduh surat tanda sudah menerima sakramen di bawah ini untuk pengambilan sertifikat sakramen resmi yang sudah ditandatangani Pastor paroki. Jangan lupa memperbarui data sakramen Anda pada user-profile Anda.',
+        ]);
+    
+        // Kirim notifikasi ke pengguna
+        $userProfile = User::where('id', $pendaftar->user_id)->first();
+        if ($userProfile && $userProfile->fcm_token) {
+            try {
+                $fcmController->sendNotificationToUser(
+                    $userProfile->fcm_token,
+                    'Pendaftaran Selesai',
+                    'Pendaftaran Anda telah ditandai selesai. Silakan unduh sertifikat Anda.',
+                    $firebase,
+                    [
+                        'sakramen_event_id' => $pendaftar->sakramen_event_id, // Data tambahan
+                        'action' => 'view_sakramen_event', // Identifikasi tindakan
+                    ]
+                    // Tambahkan parameter ini
+                );
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim notifikasi FCM: ' . $e->getMessage());
+            }
+        } else {
+            \Log::warning('FCM token tidak ditemukan untuk user_id: ' . $pendaftar->user_id);
+        }
+    
+        // Generate PDF
         $this->generatePdf($id);
-
+    
         return redirect()->route('pendaftars.show', $id)->with('success', 'Pendaftaran telah ditandai selesai.');
     }
-
     public function generatePdf($id)
     {
         $pendaftar = Pendaftars::with('sakramenEvent')->findOrFail($id);
