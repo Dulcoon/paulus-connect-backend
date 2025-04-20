@@ -65,7 +65,7 @@ class PendaftarController extends Controller
                 $fcmController->sendNotificationToUser(
                     $userProfile->fcm_token,
                     'Pendaftaran Selesai',
-                    'Pendaftaran Anda telah ditandai selesai. Silakan unduh sertifikat Anda.',
+                    $pendaftar->sakramenEvent->nama_event . ' Anda telah selesai diproses. Silahkan mengunduh sertifikat Anda.',
                     $firebase,
                     [
                         'sakramen_event_id' => $pendaftar->sakramen_event_id, // Data tambahan

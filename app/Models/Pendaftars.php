@@ -39,6 +39,8 @@ class Pendaftars extends Model
         return $this->belongsTo(SakramenEvent::class);
     }
 
+    
+
     public static function checkUserRegistration($userId, $sakramenEventId)
     {
         return self::where('user_id', $userId)
