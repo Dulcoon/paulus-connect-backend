@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Api\FCMController;
 use App\Services\FirebaseService;
+use App\Services\WhatsappService;
 
 
 
@@ -50,7 +51,7 @@ class PendaftarController extends Controller
         return redirect()->route('pendaftars.show', $id)->with('success', 'Status berhasil diperbarui.');
     }
 
-    public function tandaiSelesai($id, FCMController $fcmController, FirebaseService $firebase)
+    public function tandaiSelesai($id, FCMController $fcmController, FirebaseService $firebase, WhatsappService $whatsappService)
     {
         $pendaftar = Pendaftars::findOrFail($id);
         $pendaftar->update([
@@ -59,7 +60,7 @@ class PendaftarController extends Controller
         ]);
     
         // Kirim notifikasi ke pengguna
-        $userProfile = User::where('id', $pendaftar->user_id)->first();
+        $userProfile = User::with('profile')->where('id', $pendaftar->user_id)->first();
         if ($userProfile && $userProfile->fcm_token) {
             try {
                 $fcmController->sendNotificationToUser(
@@ -71,13 +72,31 @@ class PendaftarController extends Controller
                         'sakramen_event_id' => $pendaftar->sakramen_event_id, // Data tambahan
                         'action' => 'view_sakramen_event', // Identifikasi tindakan
                     ]
-                    // Tambahkan parameter ini
                 );
             } catch (\Exception $e) {
                 \Log::error('Gagal mengirim notifikasi FCM: ' . $e->getMessage());
             }
         } else {
             \Log::warning('FCM token tidak ditemukan untuk user_id: ' . $pendaftar->user_id);
+        }
+    
+        // Kirim pesan WhatsApp
+        if (!isset($whatsappService)) {
+            \Log::error('WhatsApp service is not initialized.');
+            return redirect()->route('pendaftars.show', $id)->with('error', 'WhatsApp service is not available.');
+        }
+    
+        $noHp = '+6285172286550'; // Ambil no_hp dari relasi profile
+        \Log::info('Mengirim pesan WhatsApp ke nomor: ' . $noHp);
+        if ($noHp) {
+            try {
+                $message = "Halo, {$userProfile->name}. Pendaftaran sakramen '{$pendaftar->sakramenEvent->nama_event}' Anda telah selesai diproses. Silahkan mengunduh sertifikat Anda melalui aplikasi.";
+                $whatsappService->sendMessage($noHp, $message);
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim pesan WhatsApp: ' . $e->getMessage());
+            }
+        } else {
+            \Log::warning('Nomor HP tidak ditemukan untuk user_id: ' . $pendaftar->user_id);
         }
     
         // Generate PDF

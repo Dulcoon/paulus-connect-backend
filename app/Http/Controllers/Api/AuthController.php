@@ -10,10 +10,50 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 
 class AuthController extends Controller
 {
+
+    public function loginWithGoogle(Request $request)
+    {
+        $request->validate([
+            'id_token' => 'required|string',
+        ]);
+    
+        // Verifikasi token ke Google
+        $googleResponse = Http::get('https://oauth2.googleapis.com/tokeninfo', [
+            'id_token' => $request->id_token,
+        ]);
+    
+        if (!$googleResponse->ok()) {
+            return response()->json(['message' => 'Invalid ID token'], 401);
+        }
+    
+        $googleUser = $googleResponse->json();
+    
+        // Ambil user atau buat baru
+        $user = User::firstOrCreate(
+            ['email' => $googleUser['email']],
+            [
+                'name' => $googleUser['name'] ?? 'Unknown',
+                'password' => Hash::make(Str::random(24)), // dummy password
+                'role' => 'user',
+                'isCompleted' => false,
+            ]
+        );
+    
+        // Buat token Sanctum
+        $token = $user->createToken('auth_token')->plainTextToken;
+    
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ]);
+    }
+    
     public function register(Request $request)
     {
         $data = $request->validate([

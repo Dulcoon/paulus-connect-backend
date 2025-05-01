@@ -4,6 +4,8 @@ use App\Http\Controllers\PendaftarController;
 use App\Http\Controllers\pengumumanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SakramenEventController;
+use App\Http\Controllers\KalenderLiturgiController;
+use App\Http\Controllers\textMisaController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -33,6 +35,11 @@ Route::middleware('auth')->group(function () {
     // kelola pengumuman
 
     Route::resource('pengumuman', pengumumanController::class);
+
+    Route::resource('kalender-liturgi', KalenderLiturgiController::class);
+    
+    Route::resource('text-misa', textMisaController::class)->except(['edit', 'update', 'show']);
+
 });
 
 
