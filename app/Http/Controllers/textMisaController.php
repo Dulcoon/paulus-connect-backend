@@ -44,6 +44,7 @@ class textMisaController extends Controller
     public function destroy(MisaPdf $misaPdf)
     {
         // Hapus file dari storage
+        \Log::info('Deleting file: ' . $misaPdf->id);
         if (Storage::disk('public')->exists($misaPdf->file_path)) {
             Storage::disk('public')->delete($misaPdf->file_path);
         }

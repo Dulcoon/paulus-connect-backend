@@ -27,6 +27,9 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/user-profile', [UserProfileController::class, 'store']);
     Route::get('/user-profile', [UserProfileController::class, 'show']);
+    Route::put('/user-profile/update', [UserProfileController::class, 'update']);
+    Route::delete('/user-profile', [UserProfileController::class, 'destroy']);
+
 
     // untuk mendapatkan data baptis-event yang aktif
     Route::get('/sakramen-events/active', [SakramenEventController::class, 'getActiveEvents']);

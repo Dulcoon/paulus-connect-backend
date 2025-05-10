@@ -1,12 +1,14 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KalenderLiturgiController;
 use App\Http\Controllers\PendaftarController;
 use App\Http\Controllers\pengumumanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SakramenEventController;
-use App\Http\Controllers\KalenderLiturgiController;
 use App\Http\Controllers\textMisaController;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -14,9 +16,10 @@ Route::get('/', function () {
     return view('auth/login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');;
+    Route::get('/dashboard/download-report', [DashboardController::class, 'downloadReport'])->name('dashboard.download-report');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

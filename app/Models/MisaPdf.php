@@ -12,7 +12,7 @@ class MisaPdf extends Model
 
     protected $fillable = [
         'judul',
-        'file_path',
         'tanggal',
+        'file_path',
     ];
 }
